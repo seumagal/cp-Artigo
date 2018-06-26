@@ -1,0 +1,239 @@
+ \section{ Dinâmica veicular }
+ \label{sec:model}
+ 
+O modelo da dinâmica veicular utilizado neste trabalho, a partir do qual
+se obteve o modelo linear utilizado para projetar o controlador e simular
+a dinâmica veícular, é composto dos movimentos lateral, longitudinal e de
+guinada e de rolagem \cite{Zheng2006,Miao2015}.
+Como pretende-se observar a resposta do veículo ao momento de guinada externo
+calculado pelo controlador sem considerar o sistema de atuação utilizado para
+isso, o modelo não considera as forças longitudinais geradas pelas rodas, que
+dependem do efeito dos atuadores na tração transferida para as rodas
+\cite{Shoutao2017}.
+A Fig. \ref{fig:modeldraw}  ilustra este modelo represetentado pelas seguintes
+equações:
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\columnwidth]{carmodel.png}
+    \caption{ Modelo do veículo com as forças aplicadas a ela e suas componentes
+    de movimento}
+    \label{fig:modeldraw}
+\end{figure}
+
+\noindent\textbf{Movimento longitudinal:}
+    \begin{equation}
+    \label{eq:model}
+    \begin{split}
+        m\left(\dot{u} - \dot{\psi} v \right) + m_sh_s\dot{\psi}\dot{\phi} = 
+    	-\sin(\delta_f)( F_{yfl} + F_{yfr} )  
+    	\\
+    \end{split}
+    \end{equation}
+\noindent\textbf{Movimento lateral:} 
+    \begin{equation}
+    \label{eq:model}
+    \begin{split}
+    	m\left(\dot{v} + \dot{\psi} u \right) - m_sh_s\ddot{\phi} =& 
+    	\cos(\delta_f)( F_{yfl} + F_{yfr} )\\ +&  F_{yrl} +  F_{yrr} \\
+    \end{split}
+    \end{equation}
+\noindent\textbf{Movimento de guinada:} 
+    \begin{equation}
+    \label{eq:model}
+    \begin{split}
+        I_{zz}\ddot{\psi} - I_{xz}\ddot{\phi} = 
+          &   a\cos(\delta_f)(F_{yfl} + F_{yfr}) - b(F_{yrl} + F_{yrr}) \\
+        - & \frac{t\sin(\delta_f)}{2}(F_{yfr} - F_{yfl} ) \\
+        + & M_{u}
+    \end{split}
+    \end{equation}
+\noindent\textbf{Movimento de rolagem:}
+\begin{equation}
+\label{eq:model}
+\begin{split}
+    I_{xx}\ddot{\phi} - I_{xz}\ddot{\psi} & = m_sh_s(\dot{v} +
+    \dot{\psi}u) + m_sh_sg\sin\phi \\
+    &- (k_{\phi f} +  K_{\phi r})\phi - (c_{\phi f} + c_{\phi r})\dot{\phi} \\
+ \end{split}        
+\end{equation}
+
+\noindent em que $v$ é a velocidade lateral, $u$ é a velocidade longitudinal,
+$\psi$ é o ângulo de guinada, $\phi$ é o ângulo de rolagem, $\delta_f$ é o
+ângulo de esterçamento das rodas dianteiras, $m$ é a massa total do veículo, 
+$m_s$ é a massa do veículo sobre o eixo de rolagem, $h_s$ é a distância entre o
+centro de rolagem e o centro de massa, $I_{zz}$ e $I_{xx}$ são os momentos de inércia de guinada e rolagem, respectivamente,
+$I_{xz}$ é o produto de inércia em relação aos eixos de guinada e de rolagem,
+$M_u$ é o momento externo de guinada calculado e
+$F_{yfl},F_{yr},F_{yrl},F_{yrr}$ são as forças latereais exercidas pelas rodas.
+
+\vspace{-5mm}
+\subsection{ Dinâmica dos pneus }
+
+As forças geradas pelas rodas são governadas por relações complexas entre o
+atrito pneu-pista, carga, ângulo de deslizamento e propriedades dos pneus. Os
+modelos amplamente utilizados baseiam-se em formulações empíricas derivadas de
+testes experimentais \cite{Dugoff1969}. 
+As não linearidades na dinâmica dos pneus 
+foram consideradas neste trabalho pela utilização da \emph{Magic Formula} (\emph{MF}) 
+para calcular a força exercida por cada roda \cite{Shoutao2017}.
+Na \emph{MF} a força lateral $F_{yi}$ exercida pela roda é modelada em função de
+carga $F_{zi}$ e o ângulo de deslizamento lateral $\alpha_i$ da roda.
+A formulação geral da \emph{MF} é expressa por \cite{Li2017}:
+\vspace{-2.5mm}
+\begin{equation}
+\label{eq:MFY}
+\begin{split}
+		F_{wyi}  & = D\sin(C\arctan[B(1-E)\alpha_i \\ 
+			     & + E\arctan(B\alpha_i)]) \\
+			  C  & = a_0 \\
+			  D  & = F_{zi}(a_1F_{zi} + a_2 ) \\
+			  B  & = \frac{(a_3\sin(2\arctan\frac{F_{zi}}{a_4})}{CD} \\
+			  E  & = a_6F_{zi} + a_7 \\
+			  i  & = fl,fr,rl,rr
+\end{split}
+\end{equation}
+
+\noindent em que $\gamma$ é o ângulo entre o eixo de rotação da roda e a pista,
+normalmente assumido como zero 
+
+Considerando a aceleração longitudinal $a_x$ e lateral $a_y$, a carga individual
+de cada roda pode ser calculada por:
+\begin{equation}
+\label{eq:wload}
+\begin{split}
+    F_{zfl} =  \frac{mgb}{2l} - \frac{ma_xh}{2l} - \frac{ma_yah}{lt_f} -
+    \frac{k_{\phi f}\phi}{t_f} - \frac{c_{\phi f}\dot\phi}{t_f} \\
+    F_{zfr} =  \frac{mgb}{2l} - \frac{ma_xh}{2l} + \frac{ma_yah}{lt_f} +
+    \frac{k_{\phi f}\phi}{t_f} + \frac{c_{\phi f}\dot\phi}{t_f} \\
+    F_{zrl} =  \frac{mga}{2l} + \frac{ma_xh}{2l} - \frac{ma_yah}{lt_r} - 
+    \frac{k_{\phi r}\phi}{t_r} - \frac{c_{\phi r}\dot\phi}{t_r} \\
+    F_{zrr} =  \frac{mga}{2l} + \frac{ma_xh}{2l} + \frac{ma_yah}{lt_r} + 
+    \frac{k_{\phi r}\phi}{t_r} + \frac{c_{\phi r}\dot\phi}{t_r}
+\end{split}
+\end{equation}
+\noindent em que $a$ é a distância das rodas dianteiras do centro de massa, $b$
+é a distância das rodas traseiras do centro de massa, $h$ é a altura do veículo,
+$l$ é a distância entre os eixos dianteiro e traseiro, $t_f$ e $t_r$ são as
+larguras dos eixos dianteira e traseiro, respectivamente.
+
+O ângulo de deslizamento lateral de cada roda, definido como o ângulo entre o
+vetor velocidade linear da roda e o seu eixo longitudinal, pode ser calculado
+por:
+\begin{equation}
+	\label{eq:alphaall}
+	\begin{split}
+		\alpha_{fl} = \delta_f - \arctan\left(\frac{v + a\dot{\psi}}{u -
+		\frac{t_f}{2}\dot{\psi}}\right)  & \enskip \alpha_{rl} = -
+		\arctan\left(\frac{v - b\dot{\psi}}{u - \frac{t_r}{2}\dot{\psi}}\right)\\
+		\alpha_{fr}  = \delta_f - \arctan\left(\frac{v + a\dot{\psi}}{u +
+		\frac{t_f}{2}\dot{\psi}}\right)  & \enskip  \alpha_{rr} = - \arctan\left(\frac{v - b\dot{\psi}}{u +
+        \frac{t_r}{2}\dot{\psi}}\right)\\
+	\end{split}
+\end{equation}
+
+\section{Sistema de controle}
+\label{sec:control}
+    
+O sistema proposto aplica o controle preditivo baseado em modelo linear
+sem restrições para calcular o momento de guinada externo em função dos erros
+da taxa de guinada, do ângulo de deslizamento lateral, da taxa de rolagem
+e do ângulo de rolagem.
+
+Considera-se que o controlador tem acesso aos quatro estados do modelo linear.
+Como os movimentos de rolagem e o deslizamento lateral são movimentos
+indesejados, a trajetória desejada para estes estados é constante e igual a
+zero.
+O valor de referência assumido para a taxa de guinada é calculado conforme 
+descrito em \cite{Jin2017,Zheng2006}:
+\begin{equation}
+	\label{eq:desiredyaw}
+	\begin{split}
+		\dot{\psi}_d  = \frac{u\delta_f}{l+lK_uu^2} \enskip&\enskip 
+		K_u = \frac{m}{l^2}\left(\frac{b}{C_r} - \frac{a}{C_f}\right)
+	\end{split}
+\end{equation}
+\begin{equation}
+	\begin{split}
+		|\dot{\psi}_d| \leq \left|\frac{\mu g}{u}\right| 
+	\end{split}
+\end{equation}
+
+O  momento de guinada é calculado pela lei de controle :
+
+$M_u(k)= K_Nx(k) + G_N\tilde{y}_d + L_Nu_d $,
+\noindent em que as matrizes matrizes $K_N$, $G_N$, $L_N$ são obtidos
+conforme descrito em \cite{alamir2013pragmatic} como solução ótima da função
+custo sem restrição do controle preditivo para sistemas LTI, $x$ é o vetor de
+estados, $\tilde{y}_d$ é um vetor composto da concatenação dos vetores de
+estados que formam a trajetória desejada no hirizonte de predição e $u_d$ é 
+o vetor de comando desejado para o estado estacionário, assumido como zero
+porque considera-se que as curvas do veículo são transitórias, pois o veículo
+sempre retorna para a condução em linha reta quando nenhum momomento externo
+deve ser aplicado.
+
+O modelo LTI utilizado no projeto do \emph{MPC}} consiste de uma
+linearização do modelo apresentado para a dinâmica veicular, assumindo
+velocidade longitudinal constante igual a 80km/h e desprezando a equação
+do movimento longitudinal. O resultado é um modelo composto pelos movimentos
+lateral, de guinada e de rolagem representados pelas equações:
+\textbf{Movimento lateral:}
+\begin{equation}
+\label{eq:linearlat}
+\begin{split}
+	m\left(\dot{v} + \dot{\psi} u \right) -m_sh_s\ddot{\phi}= \sum{F_y} \\
+\end{split}
+\end{equation}
+\textbf{Movimento de guinada:} 
+\begin{equation}
+\label{eq:lineargui}
+\begin{split}
+	I_{zz}\ddot{\psi} - I_{xz}\ddot{\phi} = a(F_{yfl} + F_{yfr}) - b(F_{yrl} +
+	F_{rr}) + M_u \\
+\end{split}
+\end{equation}
+\textbf{Movimento de rolagem:}
+\begin{equation}
+\label{eq:linearrol}
+\begin{split}
+	I_{xx}\ddot{\phi} - I_{xz}\ddot{\psi} = & m_sh_s(\dot{v} + \dot{\psi}u) +
+	m_sh_sg\phi - \\&(k_{\phi f} + k_{\phi r} ) \phi - ( c_{\phi f} + c_{\phi r} )
+	\dot{\phi} \\
+\end{split}
+\end{equation}
+
+Para as forças dos pneus é utilizada a aproximação linear da \emph{MF}:
+\begin{equation}
+	\label{eq:FMF}
+\begin{split}
+	F_{yfi} \approx C_f\alpha_f \enskip&\enskip F_{yri} \approx C_r\alpha_r
+\end{split}
+\end{equation} 
+\noindent em que $C_r$ e $C_f$ são denominados coeficientes de rigidez nas curvas das rodas traseiras e dianteiras, 
+respectivamente, os seus valores são obtidos por expansão de Taylor:
+\begin{equation}
+\begin{split}
+		C_f = \left.\frac{\partial F_{yi}}{\partial \alpha_i}\right|_{x_e} \enskip&\enskip
+		C_r = \left.\frac{\partial F_{yi}}{\partial \alpha_i}\right|_{x_e}\\
+	i = fl,fr \enskip&\enskip i = rl,rr
+	\end{split}
+\end{equation}
+\noindent em que $x_e$ representa o ponto de linearização.
+
+O ângulo de deslizamento das rodas aproximado é calculado em função do deslizamento lateral $\beta$, 
+da taxa de rolagem $\dot{\psi}$ e do esterçamento das rodas dianteiras $\delta_f$:
+\begin{equation}
+	\label{eq:alphalin}
+\begin{split}
+		\alpha_f  = -\beta - \frac{a\dot{\psi}}{u} + \delta_f \enskip&\enskip
+		\alpha_r  = -\beta + \frac{b\dot{\psi}}{u}
+	\end{split}
+\end{equation}
+\begin{equation}
+	\label{eq:beta}
+	\beta =\arctan\left(\frac{v}{u}\right)
+\end{equation}	
+
+Considerando a velocidade longitudinal constante, a manipulação algébrica das
+Equações \ref{eq:linearlat} - \ref{eq:alphalin} permite obter uma representação
+do modelo linear em espaço de estados: $\dot{x} = Ax + BM_u+ E\delta_f$.

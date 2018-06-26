@@ -1,0 +1,14 @@
+#TeXlipse project settings
+#Mon May 14 19:48:23 BRT 2018
+markTmpDer=true
+builderNum=2
+outputDir=
+makeIndSty=
+bibrefDir=
+outputFormat=pdf
+tempDir=tmp
+mainTexFile=zoe_170172767_linear_sem_restricao.tex
+outputFile=zoe_170172767_linear_sem_restricao.pdf
+langSpell=en
+markDer=true
+srcDir=

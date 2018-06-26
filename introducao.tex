@@ -1,0 +1,54 @@
+ \section{Introdução}
+ 
+\IEEEPARstart{C}{ontroladores} eletrônicos de estabilidade
+(\emph{ESC}) são sistemas de assistência ao motorista na correção de movimentos que desviem o veículo da
+trajetória desejada, contribuindo para a redução de acidentes causados
+pelo deslizamento lateral e capotamento. 
+Muitas pesquisas foram realizadas nos últimos anos para propor implemetações de
+\emph{ESCs}, em que várias técnicas de controle têm sido aplicadas
+\cite{Zhang2016, Zhai2016, Yuan2016,Li2017, Nahidi2017, Jin2017a, Jalali2017, Niaona2017, Guo2017}.
+Em \cite{Yogurtcu2015} foram desenvolvidos dois sistemas que aplicam o
+\emph{PID} e o \emph{LQR}, simulações do controle do veículo representado pelo
+modelo bicicleta foram realizadas para validar estes controladores.
+Em \cite{Subroto2017} um controle de modo deslizante adaptativo foi projetado
+para aumentar a estabilidade lateral de veículos com tração independente nas quatro rodas.
+Em \cite{Zhou2010} a técnica \emph{Backstepping} foi aplicada no projeto
+de um controlador da taxa de guinada mediante comando do sistema de freios.
+
+Uma arquitetura comum nestes sistemas é a separação do controle em dois níveis:
+o alto nível, que calcula as forças e torques que precisam ser aplicados ao
+veículo para estabilizá-lo, e o baixo nível, que
+comanda os atuadores para que os valores calculados pelo alto
+nível sejam alcançados.
+Uma vantagem dessa arquitetura é o potencial
+do controlador de alto nível para ser aplicado a veículos com diferentes
+sistemas de atuação, mas com a desvatangem de não ser auto suficiente por
+depender de um controlador de baixo nível para comandar os atuadores.
+
+Este artigo apresenta um controlador de alto nível que aplica o
+controle preditivo baseado em modelo linear sem restrições. Este
+controlador foi implementado como uma preparação para um controle preditivo
+baseado em modelo não linear que considere as restrições físicas do sinal
+de comando e imponha restrições aos estados para mantê-los dentro
+das faixas de valores desejados.  
+
+Em \cite{Li2017} e \cite{Nahidi2017} foram propostos
+controladores preditivos (\emph{MPC}) para calcular a força exigida de cada
+roda, e para a obtenção dessas forças, foi utilizado em \cite{Li2017} um
+controlador robusto do sistema de freios diferenciais e em  \cite{Nahidi2017} um
+controlador ótimo do sistema de distribuição de torque.
+O controlador proposto neste artigo calcula o momento de guinada externo a ser
+aplicado ao veículo para corrigir o deslizamento lateral e movimentos de
+rolagem indesejados e fazer a taxa de guinada rastrear uma trajetória desejada.
+
+Neste trabalho, o algoritmo de controle foi implementado como uma aplicação para
+Linux. Para validar está implementação foram realizadas simulações em que
+o algoritmo de controle e o modelo da dinâmica veícula são executados em uma
+\emph{RaspberryPi C 2010.2011} com sistema operacional 
+\emph{RASPBIAN STRETCH LITE version Appril 2018}.
+
+Este documento está organizado da seguinte forma: a Seção
+\ref{sec:model} apresenta o modelo matemático utilizado para simular a dinâmica
+veicular; a Seção \ref{sec:control} descreve o sistema de controle proposto;
+a Seção \ref{sec:result} apresenta os experimentos de validação do sistema
+proposto e a Seção \ref{sec:conc} apresenta a conclusão.

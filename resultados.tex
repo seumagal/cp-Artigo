@@ -1,0 +1,76 @@
+\section{Resultados}
+\label{sec:result}
+
+Uma biblioteca para c++ batizada de libmpc foi desenvolvida neste trabalho para 
+disponibilizar métodos para implementação de MPC para sistemas LTI sem
+restrições. Para as operações aritméticas entre matrizes e vetores 
+foi utilizada a biblioteca Eigen v3.3.4 disponibilizada em \cite{eigenweb}.
+Esta biblioteca foi utilizada para implementar o controlador de estabilidade
+lateral proposto. 
+
+No projeto do controlador as ponderações atribuida aos erros dos estados foram
+$Q_Y$ = [4,1,1E-4,1E-3] e para o erro no comando foi atribuída uma ponderação de
+1E-12. O horizonte de predição adotado foi de 100 amostras, que correspondem a
+8ms, pois o período de amostragem adotado foi 8e-5.
+
+Simulações foram realizadas para validar se o controlador é capaz de fazer a 
+taxa de guinada rastrear uma trajetória desejado enquanto o ângulos de deslizamento
+lateral e rolagem permanecem pequenos (<10 graus) de forma a manter o sistema em
+uma zona de operação próxima ao ponto de linearização. Nestas simulações o 
+controlador e o modelo computacional da dinâmica do veículo foram integrados em
+uma aplicação executada em RaspberryPi 2011.12 com sistema operacioal \emph{RaspberryPi C 2010.2011} com sistema operacional 
+\emph{RASPBIAN STRETCH LITE version Appril 2018}. Para simulação da dinâmica
+veicular foi utilizado o modelo linear apresentado em \ref{sec:control}.
+Os parâmetros do modelo estão apresentados na tabela \ref{tab:model}.
+
+As manobras escolhidas para os testes foram a anzol e a mudança dupla de faixa
+em alta velocidade e com alto esterçamento das rodas dianteiras. 
+A manobra anzol consiste de uma curva breve em uma direção seguida de
+uma curva de longa duração na direção oposta \cite{Mashadi2010,Dahmani2015,Dahmani2016,Li2017}.
+A mudança dupla são duas curvas breves em direções
+opostas com um curto intervalo entre elas \cite{Ren2015,Rafaila2016,Zhai2016}.
+Essas manobras foram testadas com velocidade inicial de 80km/h e esterçamento
+máximo da rodas dianteiras igual a 10 graus.
+
+\begin{figure*}[h]
+    \centering
+    \includegraphics[width=\textwidth]{fish.jpg}
+    \caption{ Resultados obtidos para a manobra anzol}
+    \label{fig:testeFish}
+\end{figure*}
+\vskip
+\begin{figure*}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{doublelane.jpg}
+    \caption{ Resultados obtidos para a mudança de faixa dupla }
+    \label{fig:testeDouble}
+\end{figure*}
+
+Os resultados mostram que nas duas manobras o controlador foi capaz de fazer a
+taxa de guinada seguir a trajetória desejada com valor superior ao seu valor em
+malha aberta e ainda diminui o deslizamento lateral e os movimentos de rolagem.
+
+\begin{table}[t!]
+\caption{ Parâmetros do modelo utilizados na simulação}
+\label{tab:model}
+\begin{adjustbox}{width=\columnwidth,center}
+\begin{tabular}{|ll|ll|}
+\hline
+  Parâmetro     & Valor           & Parâmetro       & Valor \\
+ \hline
+  a             & 1.035 m          &$a_0$             & 1.6   \\
+  b             & 1.655 m          &$a_1$             & -34  \\
+  $t_f$         & 1.520 m          &$a_2$             & 1250 \\
+  $t_r$         & 1.540 m          &$a_3$             & 2320 \\
+  hs            & 0.451 m          &$a_5$             & 0  \\
+  hg            & 0.550 m          &$a_6$             & -0.0053 \\
+  m             & 1704.7 Kg        &$a_7$             & 0.1925  \\
+  $m_s$         & 1526.9 Kg        & $c_{\phi f}$     & 2823N m s/rad \\
+  $I_{zz}$      & 3048.1 $Kgm^2$   & $c_{\phi r}$     & 2652N m s/rad\\
+  $c_{\phi r}$  & 2652 Nms/rad     & $k_{\phi f}$     & 47298N m /rad\\
+  $I_{xx}$      & 744.0 $Kgm^2$    & $k_{\phi r}$     & 47311N m /rad\\
+  $I_{xz}$      & 50 $Kgm^2$       &                  & \\
+\hline
+\end{tabular}
+\end{adjustbox}
+\end{table}
